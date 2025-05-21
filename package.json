@@ -2,10 +2,16 @@
   "name": "pawapay-sdk",
   "version": "1.0.0",
   "main": "index.js",
+  "types": "./dist/",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
+  "files": [
+    "package.json",
+    "dist/",
+    "README.md"
+  ],
   "author": "",
   "license": "ISC",
   "description": "",
