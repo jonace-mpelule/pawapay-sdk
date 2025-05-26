@@ -1,19 +1,40 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./dist",
-    "strict": true,
-    "esModuleInterop": true,
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "ESNext.AsyncIterable"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "/src/types"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "pretty": true,
+    "sourceMap": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "outDir": "./dist",
+    "allowJs": true,
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
   },
   "include": [
-    "src/**/*"
+    "./src/**/*",
   ],
   "exclude": [
     "node_modules",
-    "**/*.test.ts"
-  ]
+    "tests"
+  ],
 }

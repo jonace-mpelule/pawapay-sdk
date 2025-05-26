@@ -1,5 +1,31 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { DepositConfig, PawaPayError, DepositResponse, PawaPayResponse, RequestOptions, DepositStatus, ResendDepositResponse, WalletBalance, PublicKeysResponse, ActiveConfigurationResponse, AvailableCorrespondentResponse, PredictCorrespondentResponse, RequestPayPageConfig, RequestPayPageResponse, RequestRefundConfig, RequestRefundResponse, ResendRefundCallbackResponse } from './types';
+import {
+    DepositConfig,
+    PawaPayError,
+    DepositResponse,
+    PawaPayResponse,
+    RequestOptions,
+    DepositStatus,
+    ResendDepositResponse,
+    WalletBalance,
+    PublicKeysResponse,
+    ActiveConfigurationResponse,
+    AvailableCorrespondentResponse,
+    PredictCorrespondentResponse,
+    RequestPayPageConfig,
+    RequestPayPageResponse,
+    RequestRefundConfig,
+    RequestRefundResponse,
+    ResendRefundCallbackResponse,
+    RequestPayoutConfig,
+    RequestPayoutRespose,
+    CheckPayoutStatusResponse,
+    CancelEnqueuedPayoutResponse,
+    RequestBulkPayoutConfig,
+    RequestBuildPayoutResponse,
+    ResendPayoutCallbackResponse,
+    CheckRefundStatusResponse
+} from './types/index.t.ts';
 
 type Args = {
     options?: RequestOptions;
@@ -12,7 +38,7 @@ type ClientConfig = {
 
 export class PawaPayClient {
     private apiClient: AxiosInstance;
-    private apiKey: string;
+    protected apiKey: string;
     private config?: ClientConfig;
 
     constructor(apiKey: string, config?: ClientConfig,) {
@@ -27,7 +53,8 @@ export class PawaPayClient {
         });
     }
 
-    private async request<T, E>(config: AxiosRequestConfig, options?: RequestOptions): Promise<PawaPayResponse<T, E>> {
+    private async request<T, E>(config: AxiosRequestConfig, options?: RequestOptions)
+        : Promise<PawaPayResponse<T, E>> {
         try {
             const response = await this.apiClient.request<T>(config);
             return {
@@ -54,6 +81,8 @@ export class PawaPayClient {
         }
     }
 
+    // --- Deposits
+
     async requestDeposit(data: DepositConfig, { options }: { options?: RequestOptions } = {})
         : Promise<PawaPayResponse<DepositResponse, PawaPayError>> {
 
@@ -66,7 +95,7 @@ export class PawaPayClient {
 
 
     async checkDepositStatus(depositId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<DepositStatus, PawaPayError>> {
+        : Promise<PawaPayResponse<DepositStatus[], PawaPayError>> {
         return this.request({
             method: 'GET',
             url: `/deposits/${depositId}`
@@ -83,6 +112,51 @@ export class PawaPayClient {
         }, options)
     }
 
+    // --- PAYOUTS
+
+    async requestPayout(data: RequestPayoutConfig, { options }: { options?: RequestOptions } = {})
+        : Promise<PawaPayResponse<RequestPayoutRespose, PawaPayError>> {
+        return this.request({
+            method: 'POST',
+            url: '/payouts',
+            data
+        }, options)
+    }
+
+    async checkPayoutStatus(payoutId: string, { options }: { options?: RequestOptions } = {})
+        : Promise<PawaPayResponse<CheckPayoutStatusResponse[], PawaPayError>> {
+        return this.request({
+            method: 'GET',
+            url: `/payouts/${payoutId}`
+        }, options)
+    }
+
+    async resendPayoutCallback(payoutId: string, { options }: { options?: RequestOptions } = {})
+        : Promise<PawaPayResponse<ResendPayoutCallbackResponse, PawaPayError>> {
+        const data = { payoutId }
+        return this.request({
+            method: 'POST',
+            url: '/payouts/resend-callback',
+            data
+        }, options)
+    }
+
+    async cancelEnqueuedPayout(payoutId: string, { options }: { options?: RequestOptions } = {})
+        : Promise<PawaPayResponse<CancelEnqueuedPayoutResponse, PawaPayError>> {
+        return this.request({
+            method: 'POST',
+            url: `/payouts/fail-enqueued/${payoutId}`,
+        }, options)
+    }
+
+    async requestBulkPayout(data: RequestBulkPayoutConfig[], { options }: { options?: RequestOptions } = {})
+        : Promise<PawaPayResponse<RequestBuildPayoutResponse[], PawaPayError>> {
+        return this.request({
+            method: 'POST',
+            url: '/payouts/bulk',
+            data,
+        }, options)
+    }
 
     // --- REFUND
     async requestRefund(refundConfig: RequestRefundConfig, { options }: { options?: RequestOptions } = {})
@@ -95,7 +169,7 @@ export class PawaPayClient {
     }
 
     async checkRefundStatus(refundId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<{}, PawaPayError>> {
+        : Promise<PawaPayResponse<CheckRefundStatusResponse[], PawaPayError>> {
         return this.request({
             method: 'GET',
             url: `/refunds/${refundId}`
@@ -111,7 +185,6 @@ export class PawaPayClient {
         }, options)
     }
 
-
     // --- PAYMENT PAGE
 
     async requestPaymentPage(payload: RequestPayPageConfig, { options }: { options?: RequestOptions } = {})
@@ -126,7 +199,7 @@ export class PawaPayClient {
     // --- WALLETS
 
     async checkWalletBalances({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<Array<WalletBalance>, PawaPayError>> {
+        : Promise<PawaPayResponse<WalletBalance, PawaPayError>> {
         return this.request({
             method: 'GET',
             url: '/v1/wallet-balances'
@@ -134,13 +207,12 @@ export class PawaPayClient {
     }
 
     async checkWalletBalancesByCountry(country: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<Array<WalletBalance>, PawaPayError>> {
+        : Promise<PawaPayResponse<WalletBalance, PawaPayError>> {
         return this.request({
             method: 'GET',
             url: `/v1/wallet-balances/${country}`
         })
     }
-
 
     // --- TOOLKIT
 
@@ -152,19 +224,17 @@ export class PawaPayClient {
         }, options)
     }
 
-
     async getAvailableCorrespondent({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<Array<AvailableCorrespondentResponse>, PawaPayError>> {
+        : Promise<PawaPayResponse<AvailableCorrespondentResponse[], PawaPayError>> {
         return this.request({
             method: 'GET',
             url: '/availability'
         }, options)
     }
 
-
-    async predictCorrespondent(msisdn: string, { options }: { options?: RequestOptions } = {})
+    redictCorrespondent(msisdn: string, { options }: { options?: RequestOptions } = {})
         : Promise<PawaPayResponse<PredictCorrespondentResponse, PawaPayError>> {
-        var data = { msisdn }
+        const data = { msisdn }
         return this.request({
             method: 'GET',
             url: '/v1/predict-correspondent',
@@ -173,11 +243,10 @@ export class PawaPayClient {
     }
 
     getPublicKey({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<Array<PublicKeysResponse>, PawaPayError>> {
+        : Promise<PawaPayResponse<PublicKeysResponse[], PawaPayError>> {
         return this.request({
             method: 'GET',
             url: '/public-key/https'
         }, options)
     }
-
 }

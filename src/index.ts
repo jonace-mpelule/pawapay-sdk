@@ -1,5 +1,5 @@
-export * from "./client"
-export {
+export * from "./client.ts"
+export type {
     PawaPayError,
     DepositConfig,
     DepositResponse,
@@ -13,4 +13,18 @@ export {
     PredictCorrespondentResponse,
     PublicKeysResponse,
     ResendDepositResponse,
-} from "./types"
+    PayoutCallback,
+    PawaPayResponse,
+    RequestOptions,
+    DepositStatus,
+    ResendRefundCallbackResponse,
+    RequestPayoutConfig,
+    RequestPayoutRespose,
+    CheckPayoutStatusResponse,
+    CancelEnqueuedPayoutResponse,
+    RequestBulkPayoutConfig,
+    RequestBuildPayoutResponse,
+    ResendPayoutCallbackResponse,
+    RefundCallback,
+    CheckRefundStatusResponse
+} from "./types/index.t.ts"
