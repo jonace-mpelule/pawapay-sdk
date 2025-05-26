@@ -90,7 +90,7 @@ const payoutConfig = {
   amount: '50.00',
   currency: 'MWK',
   correspondent: 'AIRTEL_MWI',
-  receipient: '265991234567',
+  recipient: '265991234567',
   customerTimestamp: new Date().toISOString(),
   statementDescription: 'Payout for service',
   country: 'MWI',

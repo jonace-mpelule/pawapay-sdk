@@ -208,7 +208,7 @@ export type RequestPayoutConfig = {
      * Format: Only digits, no whitespaces or separators, no leading zero, must include country code.
      * @example "265999123456"
      */
-    receipient: string,
+    recipient: string,
     /**
      * @description The timestamp of when the payout was created in the pawaPay platform.
      * Format defined by 'date-time' in RFC3339 section 5.6.
