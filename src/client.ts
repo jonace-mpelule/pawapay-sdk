@@ -232,7 +232,7 @@ export class PawaPayClient {
         }, options)
     }
 
-    redictCorrespondent(msisdn: string, { options }: { options?: RequestOptions } = {})
+    predictCorrespondent(msisdn: string, { options }: { options?: RequestOptions } = {})
         : Promise<PawaPayResponse<PredictCorrespondentResponse, PawaPayError>> {
         const data = { msisdn }
         return this.request({

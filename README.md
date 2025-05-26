@@ -1,10 +1,20 @@
-# pawaPay SDK for Node.js
+# PawaPay SDK for Node.js
 
-![npm](https://img.shields.io/npm/v/pawapay-sdk)
-![npm downloads](https://img.shields.io/npm/dm/pawapay-sdk)
-![GitHub stars](https://img.shields.io/github/stars/pawapay/pawapay-sdk?style=social)
-![GitHub issues](https://img.shields.io/github/issues/pawapay/pawapay-sdk)
-![GitHub last commit](https://img.shields.io/github/last-commit/pawapay/pawapay-sdk)
+<p align="center">
+  <img src="https://camo.githubusercontent.com/d0a69e9f739056676aa125e5d8cf86d739719451e104bc215e4f38cc12ae4919/68747470733a2f2f676c6f62616c2d75706c6f6164732e776562666c6f772e636f6d2f3632383234353931303135616133313466643330386466312f3634313162323635393665336465336635323535316330305f4c6f676f706177617061792d702d3530302e706e67" alt="pawaPay Logo" width="220"/>
+</p>
+
+<p align="center">
+  <b>This SDK is a one-to-one mapping with the official <a href="https://docs.pawapay.io/v1/api-reference/">pawaPay API documentation</a>.</b><br/>
+  Please always refer to the official docs for the most up-to-date API details.<br/>
+  <a href="https://docs.pawapay.io/v1/api-reference/">https://docs.pawapay.io/v1/api-reference/</a>
+</p>
+
+[![npm](https://img.shields.io/npm/v/pawapay-sdk)](https://www.npmjs.com/package/pawapay-sdk)
+[![npm downloads](https://img.shields.io/npm/dm/pawapay-sdk)](https://www.npmjs.com/package/pawapay-sdk)
+[![GitHub stars](https://img.shields.io/github/stars/jonace-mpelule/pawapay-sdk?style=social)](https://github.com/jonace-mpelule/pawapay-sdk)
+[![GitHub issues](https://img.shields.io/github/issues/jonace-mpelule/pawapay-sdk)](https://github.com/jonace-mpelule/pawapay-sdk/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/jonace-mpelule/pawapay-sdk)](https://github.com/jonace-mpelule/pawapay-sdk/commits/main)
 
 A comprehensive TypeScript/JavaScript SDK for integrating with the pawaPay API, enabling seamless mobile money operations such as deposits, payouts, refunds, wallet balance checks, and more.
 
@@ -163,9 +173,9 @@ const config = await client.getActiveConfiguration({});
 ```typescript
 const correspondents = await client.getAvailableCorrespondent({});
 ```
-- **redictCorrespondent(msisdn, options?)**: Predict the correct correspondent for a phone number.
+- **predictCorrespondent(msisdn, options?)**: Predict the correct correspondent for a phone number.
 ```typescript
-const prediction = await client.redictCorrespondent('265991234567', {});
+const prediction = await client.predictCorrespondent('265991234567', {});
 ```
 - **getPublicKey(options?)**: Retrieve public keys for callback signature verification.
 ```typescript
