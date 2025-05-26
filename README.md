@@ -195,6 +195,71 @@ if (response.success) {
 }
 ```
 
+## Types
+
+The following TypeScript types are exported by the `pawapay-sdk` package and can be imported for use in your own code:
+
+- `PawaPayError`
+- `DepositConfig`
+- `DepositResponse`
+- `RequestPayoutConfig`
+- `RequestBulkPayoutConfig`
+- `RequestPayPageConfig`
+- `RequestRefundConfig`
+- `WalletBalance`
+- `PawaPayResponse<T, E>`
+- `BaseRequestPayoutResponse`
+- `RequestBulkPayoutResponse`
+- `RequestPayPageResponse`
+- `RequestRefundResponse`
+- `WalletBalanceResponse`
+- `DepositCallback`
+- `PayoutCallback`
+- `RefundCallback`
+- `PayPageCallback`
+
+**Example:**
+
+```typescript
+import { DepositConfig, PawaPayResponse, PawaPayError } from "pawapay-sdk";
+```
+
+- **checkWalletBalancesByCountry(country, options?)**: Get wallet balances for a specific country.
+```typescript
+const mwBalances = await client.checkWalletBalancesByCountry('MWI', {});
+```
+
+### Toolkit
+- **getActiveConfiguration(options?)**: Get merchant configuration and supported correspondents.
+```typescript
+const config = await client.getActiveConfiguration({});
+```
+- **getAvailableCorrespondent(options?)**: List available correspondents and their operational status.
+```typescript
+const correspondents = await client.getAvailableCorrespondent({});
+```
+- **predictCorrespondent(msisdn, options?)**: Predict the correct correspondent for a phone number.
+```typescript
+const prediction = await client.predictCorrespondent('265991234567', {});
+```
+- **getPublicKey(options?)**: Retrieve public keys for callback signature verification.
+```typescript
+const publicKeys = await client.getPublicKey({});
+```
+
+## Error Handling
+All methods return a `PawaPayResponse<T, E>` object:
+```typescript
+const response = await client.requestDeposit(depositConfig);
+if (response.success) {
+  // Access response.data
+  console.log('Success:', response.data);
+} else {
+  // Access response.error and response.status
+  console.error('Error:', response.error, 'Status:', response.status);
+}
+```
+
 ## Environments
 - `sandbox`: For testing and development
 - `live`: For production use
