@@ -48,7 +48,7 @@ const refundId = uuidv4();
 
 ## Usage
 ```typescript
-import { PawaPayClient } from './src/client';
+import { PawaPayClient } from 'pawapay-sdk';
 
 const client = new PawaPayClient('YOUR_API_KEY', { environment: 'sandbox' });
 ```
