@@ -1110,12 +1110,12 @@ type RefundCallback = {
 type WalletBalance = {
     balances: {
         /**
-     * @description The country in which the MMO operates.
-     *
-     * Format is ISO 3166-1 alpha-3, three character country code in upper case. Read more from {@link https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements | Wikipedia}.
-     *
-     * @example Example: "MWI"
-     */
+         * @description The country in which the MMO operates.
+         *
+         * Format is ISO 3166-1 alpha-3, three character country code in upper case. Read more from {@link https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements | Wikipedia}.
+         *
+         * @example Example: "MWI"
+         */
         country: string;
         /**
          * @description The current balance of the wallet.
@@ -1169,7 +1169,7 @@ type CorrespondentOperationalType = {
 };
 type CorrespondentData = {
     correspondent: string;
-    operationaType: Array<CorrespondentOperationalType>;
+    operationalType: Array<CorrespondentOperationalType>;
 };
 interface AvailableCorrespondentResponse extends Countries<CorrespondentData> {
 }

@@ -27,9 +27,7 @@ import {
     CheckRefundStatusResponse
 } from './types/index.t.ts';
 
-type Args = {
-    options?: RequestOptions;
-};
+
 
 type ClientConfig = {
     environment?: "live" | "sandbox",
@@ -104,7 +102,7 @@ export class PawaPayClient {
 
     async resendDepositCallback(depositId: string, { options }: { options?: RequestOptions } = {})
         : Promise<PawaPayResponse<ResendDepositResponse, PawaPayError>> {
-        var data = { depositId }
+        const data = { depositId }
         return this.request({
             method: 'POST',
             url: '/deposits/resend-callback',
