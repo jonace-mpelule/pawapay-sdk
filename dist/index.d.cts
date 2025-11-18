@@ -162,6 +162,181 @@ type DepositConfig = {
         isPII?: boolean;
     }>;
 };
+type DepositCallback = {
+    /**
+     *  @description A UUIDv4 based ID specified by you, that uniquely identifies the deposit.
+     *  Required string length: 36
+     *  @example depositId: "<INSERT_UUID_FOR_DEPOSIT>"
+     */
+    depositId: string;
+    /**
+     * @description The final status of the payment.
+     * COMPLETED - The payment has been successfully processed.
+     * FAILED - The payment request has been proceessed, but failed.
+     * Available options: `COMPLETED`, `FAILED`
+     */
+    status: string;
+    /**
+     * @description The amount to be collected or disbursed.
+     *
+     * Amount must follow below requirements or the request will be rejected:
+     *
+     * Between zero and two decimal places can be supplied, depending on what the specific MMO supports. Learn about all MMO supported decimal places.
+     * The minimum and maximum amount depends on the limits of the specific MMO. You can find them from the Active Configuration endpoint.
+     * Leading zeroes are not permitted except where the value is less than 1. For any value less than one, one and only one leading zero must be supplied.
+     * Trailing zeroes are permitted.
+     *
+     * Valid examples:
+     *
+     * 5, 5.0, 5.00, 5.5, 5.55, 5555555, 0.5
+     *
+     * Not valid examples:
+     *
+     * @ 5., 5.555, 5555555555555555555, .5, -5.5, 00.5, 00.00, 00001.32
+     *
+     * Required string length: 1 - 23
+     *
+     * @example Example: "15"
+   
+     */
+    requestedAmount: string;
+    /**
+     * @description The currency in which the amount is specified.
+     *
+     * Format must be the ISO 4217 three character currency code in upper case. Read more from {@link https://en.wikipedia.org/wiki/ISO_4217#Active_codes  |Wikipedia}.
+     *
+     * You can find all the supported currencies that the specific correspondent supports {@link https://docs.pawapay.io/using_the_api#correspondents | from here}.
+     *
+     * The {@link https://docs.pawapay.io/v1/api-reference/toolkit/active-configuration | active configuration} endpoint provides the list of correspondents configured for your account together with the currencies.
+     *
+     * @example Example: "MWK"
+     */
+    currency: string;
+    /**
+     * @description The country in which the MMO operates.
+     *
+     * Format is ISO 3166-1 alpha-3, three character country code in upper case. Read more from {@link https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements | Wikipedia}.
+     *
+     * @example Example: "MWI"
+     */
+    country: string;
+    /**
+     * @description The correspondent code refers to the specific MMO that the specified phone number (MSISDN) has an active mobile money wallet with.
+     *
+     * You can find all the supported correspondents {@link https://docs.pawapay.io/using_the_api#correspondents | listed here}.
+     *
+     * The {@link https://docs.pawapay.io/v1/api-reference/toolkit/active-configuration | active configuration} endpoint provides the list of correspondents configured for your account.
+     *
+     * You can use the {@link https://docs.pawapay.io/v1/api-reference/toolkit/predict-correspondent | predict correspondent} enpoint to predict the correct correspondent to use based on the phone number (MSISDN).
+     *
+     * @example
+     * Example: "AIRTEL_MWI"
+     */
+    correspondent: string;
+    /**
+     * @description The phone number (MSISDN) of the recipient or payer must be specified as the `value` of the `address`.
+     */
+    payer: {
+        /** @description The type of financial address. At the moment, only MSISDN is supported as the financial address.
+         * @example
+         * {
+         *  type: "MSISDN"
+         * }
+         */
+        type: "MSISDN" & string;
+        /**
+         * @description The phone number (MSISDN) of the payer or recipient.
+         *
+         * The format is described in {@link https://en.wikipedia.org/wiki/MSISDN | Wikipedia}.
+         *
+         * MSISDN validation has following rules:
+         *
+         * - Only digits without whitespaces or any other separators or prefixes like '+'
+         * - Should not start with zero.
+         * - Country code is mandatory.
+         * - Should not exceed or be less than the valid length of specified country.
+         * - Valid examples for Malawi: 265999123456
+         *
+         * Not valid examples for Malawi:
+         * +265999123456, +2650999123456, 265 999 123 456, 265-9991-23456, 0265999123456,
+         *
+         * @example {value: "265 999 123 678"}
+         *
+         */
+        address: {
+            value: string;
+        };
+    };
+    /**
+     * @description The timestamp of when the deposit was created in the pawaPay platform.
+     *
+     * Format defined by 'date-time' in RFC3339 section 5.6 from {@link https://tools.ietf.org/html/rfc3339#section-5.6 | IETF}
+     *
+     * @example Example:"2020-02-21T17:32:28Z"
+     */
+    customerTimestamp: string;
+    /**
+     * @description Short description for the transaction.
+     *
+     * Depending on the specific MMO performing the transaction this message may be visible to the customer in the SMS receipt or within their transaction history.
+     *
+     * Must be between 4 and 22 alphanumeric characters.
+     *
+     * Required string length: 4 - 22
+     *
+     * @example Example: "Note of 4 to 22 chars"
+     */
+    statementDescription: string;
+    /**
+     * ISO Date String
+     * @example "2020-10-19T11:17:01Z"
+     */
+    created: string;
+    /**
+     * @description The amount to be collected or disbursed.
+     *
+     * Amount must follow below requirements or the request will be rejected:
+     *
+     * Between zero and two decimal places can be supplied, depending on what the specific MMO supports. Learn about all MMO supported decimal places.
+     * The minimum and maximum amount depends on the limits of the specific MMO. You can find them from the Active Configuration endpoint.
+     * Leading zeroes are not permitted except where the value is less than 1. For any value less than one, one and only one leading zero must be supplied.
+     * Trailing zeroes are permitted.
+     *
+     * Valid examples:
+     *
+     * 5, 5.0, 5.00, 5.5, 5.55, 5555555, 0.5
+     *
+     * Not valid examples:
+     *
+     * @ 5., 5.555, 5555555555555555555, .5, -5.5, 00.5, 00.00, 00001.32
+     *
+     * Required string length: 1 - 23
+     *
+     * @example Example: "15"
+   
+     */
+    depositedAmount: string;
+    /**
+     * @description When the MNO responded to this deposit request.
+     * Format defined by 'date-time' in RFC3339 section 5.6 (https://tools.ietf.org/html/rfc3339#section-5.6)
+     *
+     * Example: "2020-02-21T17:32:30Z"
+     */
+    respondedByPayer: string;
+    /**
+     * @description The unqiue ID for this financial transaction assigned by the MNO.
+     */
+    correspondentIds: {};
+    suspiciousActivityReport: {
+        activityTypw: string;
+        comment: string;
+    }[];
+    failureReason: {
+        failureCode: string;
+        failureMessage: string;
+    };
+    metadata: {};
+};
 type RequestPayoutConfig = {
     /**
      * @description A UUIDv4 based ID specified by you, that uniquely identifies the payout.
@@ -1254,4 +1429,4 @@ declare class PawaPayClient {
     }): Promise<PawaPayResponse<PublicKeysResponse[], PawaPayError>>;
 }
 
-export { type ActiveConfigurationResponse, type AvailableCorrespondentResponse, type CancelEnqueuedPayoutResponse, type CheckPayoutStatusResponse, type CheckRefundStatusResponse, type DepositConfig, type DepositResponse, type DepositStatus, PawaPayClient, type PawaPayError, type PawaPayResponse, type PayoutCallback, type PredictCorrespondentResponse, type PublicKeysResponse, type RefundCallback, type RequestBuildPayoutResponse, type RequestBulkPayoutConfig, type RequestOptions, type RequestPayPageConfig, type RequestPayPageResponse, type RequestPayoutConfig, type RequestPayoutRespose, type RequestRefundConfig, type RequestRefundResponse, type ResendDepositResponse, type ResendPayoutCallbackResponse, type ResendRefundCallbackResponse, type WalletBalance };
+export { type ActiveConfigurationResponse, type AvailableCorrespondentResponse, type CancelEnqueuedPayoutResponse, type CheckPayoutStatusResponse, type CheckRefundStatusResponse, type DepositCallback, type DepositConfig, type DepositResponse, type DepositStatus, PawaPayClient, type PawaPayError, type PawaPayResponse, type PayoutCallback, type PredictCorrespondentResponse, type PublicKeysResponse, type RefundCallback, type RequestBuildPayoutResponse, type RequestBulkPayoutConfig, type RequestOptions, type RequestPayPageConfig, type RequestPayPageResponse, type RequestPayoutConfig, type RequestPayoutRespose, type RequestRefundConfig, type RequestRefundResponse, type ResendDepositResponse, type ResendPayoutCallbackResponse, type ResendRefundCallbackResponse, type WalletBalance };
