@@ -3,6 +3,7 @@ export type {
     PawaPayError,
     DepositConfig,
     DepositResponse,
+    DepositCallback,
     RequestPayPageConfig,
     RequestPayPageResponse,
     RequestRefundConfig,
