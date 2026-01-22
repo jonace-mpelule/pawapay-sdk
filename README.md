@@ -1,7 +1,7 @@
 # PawaPay SDK for Node.js
 
 <p align="center">
-  <img src="https://camo.githubusercontent.com/d0a69e9f739056676aa125e5d8cf86d739719451e104bc215e4f38cc12ae4919/68747470733a2f2f676c6f62616c2d75706c6f6164732e776562666c6f772e636f6d2f3632383234353931303135616133313466643330386466312f3634313162323635393665336465336635323535316330305f4c6f676f706177617061792d702d3530302e706e67" alt="pawaPay Logo" width="220"/>
+  <img src="https://cdn.prod.website-files.com/62824591015aa314fd308df1/66cf1b87a6a22a3cb5511621_Logo-3.svg" alt="pawaPay Logo" width="220"/>
 </p>
 
 <p align="center">
@@ -16,23 +16,25 @@
 [![GitHub issues](https://img.shields.io/github/issues/jonace-mpelule/pawapay-sdk)](https://github.com/jonace-mpelule/pawapay-sdk/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/jonace-mpelule/pawapay-sdk)](https://github.com/jonace-mpelule/pawapay-sdk/commits/main)
 
-A comprehensive TypeScript/JavaScript SDK for integrating with the pawaPay API, enabling seamless mobile money operations such as deposits, payouts, refunds, wallet balance checks, and more.
+A comprehensive TypeScript/JavaScript SDK for integrating with the pawaPay API, enabling seamless mobile money operations. This SDK supports the latest **API Version 2**.
 
 ## Features
 - **Deposits**: Initiate, check status, and manage deposit transactions.
 - **Payouts**: Send single or bulk payouts, check payout status, resend callbacks, and cancel enqueued payouts.
-- **Refunds**: Request refunds, check refund status, and resend refund callbacks.
-- **Wallets**: Retrieve wallet balances by country or overall.
+- **Refunds**: Initiate refunds, check refund status, and resend refund callbacks.
+- **Remittances**: Initiate cross-border remittances, check status, and manage callbacks.
+- **Wallets**: Retrieve wallet balances.
+- **Statements**: Request financial statements and check their generation status.
 - **Payment Pages**: Generate hosted payment pages for customer payments.
-- **Toolkit**: Access configuration, available correspondents, correspondent prediction, and public keys.
+- **Toolkit**: Access configuration, available providers, provider prediction, and public keys.
 
 ## Installation
 ```bash
-npm install pawapay-sdk
+npm install pawapay-sdk@latest
 ```
 
 ## Generating UUIDs for Transaction IDs
-You can generate UUIDs for `depositId`, `payoutId`, and `refundId` using the [uuid](https://www.npmjs.com/package/uuid) package (version 4):
+You can generate UUIDs for `depositId`, `payoutId`, `refundId`, etc., using the [uuid](https://www.npmjs.com/package/uuid) package (version 4):
 
 ```bash
 npm install uuid
@@ -43,15 +45,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 const depositId = uuidv4();
 const payoutId = uuidv4();
-const refundId = uuidv4();
 ```
 
 ## Usage
-```typescript
-import { PawaPayClient } from 'pawapay-sdk';
+Initialize the client with your API Key and configuration.
 
-const client = new PawaPayClient('YOUR_API_KEY', { environment: 'sandbox' });
+```typescript
+import { createPawaPayClient } from 'pawapay-sdk';
+
+const client = createPawaPayClient('YOUR_API_KEY', {
+  apiVersion: 'v2',
+  environment: 'sandbox', // or 'live'
+});
 ```
+ _‼️ **Note**: V1 is deprecated. Please migrate to V2 for the latest features and support._
+
 
 ## API Reference & Examples
 
@@ -59,43 +67,60 @@ const client = new PawaPayClient('YOUR_API_KEY', { environment: 'sandbox' });
 - **requestDeposit(data, options?)**: Initiate a deposit.
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
-const depositConfig = {
+import type { DepositConfig_v2 } from "pawapay-sdk";
+
+const depositConfig: DepositConfig_v2 = {
   depositId: uuidv4(),
-  amount: '100.00',
-  currency: 'MWK',
-  country: 'MWI',
-  correspondent: 'AIRTEL_MWI',
-  payer: { type: 'MSISDN', address: { value: '265991234567' } },
-  customerTimestamp: new Date().toISOString(),
-  statementDescription: 'Payment for order 1234',
-  metadata: [{ fieldName: 'orderId', fieldValue: '1234' }]
+  amount: "100.00",
+  currency: "MWK",
+  payer: {
+    type: "MMO",
+    accountDetails: {
+      phoneNumber: "+265999644321",
+      provider: "AIRTEL_MWI",
+    },
+  },
+  customerMessage: "Payment for order #123",
+  metadata: [
+    {
+      orderId: "or_213243455332",
+    },
+  ],
 };
-const depositResponse = await client.requestDeposit(depositConfig);
+
+const deposit = await client.requestDeposit(depositConfig);
 ```
 - **checkDepositStatus(depositId, options?)**: Get status of a deposit.
 ```typescript
-const statusResponse = await client.checkDepositStatus(depositConfig.depositId);
+const statusResponse = await client.checkDepositStatus("DEPOSIT_ID_UUID");
 ```
 - **resendDepositCallback(depositId, options?)**: Resend deposit callback.
 ```typescript
-const resendResponse = await client.resendDepositCallback(depositConfig.depositId);
+const resendResponse = await client.resendDepositCallback("DEPOSIT_ID_UUID");
 ```
 
 ### Payouts
 - **requestPayout(data, options?)**: Initiate a payout.
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
-const payoutConfig = {
+import type { RequestPayoutConfig_v2 } from "pawapay-sdk";
+
+const payoutConfig: RequestPayoutConfig_v2 = {
   payoutId: uuidv4(),
   amount: '50.00',
   currency: 'MWK',
-  correspondent: 'AIRTEL_MWI',
-  recipient: '265991234567',
-  customerTimestamp: new Date().toISOString(),
-  statementDescription: 'Payout for service',
-  country: 'MWI',
+  recipient: {
+    type: "MMO",
+    accountDetails: {
+      phoneNumber: "265991234567",
+      provider: "AIRTEL_MWI"
+    }
+  },
+  customerMessage: 'Payout for service',
+  clientReferenceId: 'REF-12345',
   metadata: []
 };
+
 const payoutResponse = await client.requestPayout(payoutConfig);
 ```
 - **checkPayoutStatus(payoutId, options?)**: Get payout status.
@@ -110,76 +135,117 @@ const resendPayout = await client.resendPayoutCallback(payoutConfig.payoutId);
 ```typescript
 const cancelResponse = await client.cancelEnqueuedPayout(payoutConfig.payoutId);
 ```
-- **requestBulkPayout(data[], options?)**: Send multiple payouts in bulk.
+- **initiateBulkPayout(data[], options?)**: Send multiple payouts in bulk.
 ```typescript
+// Takes an array of RequestPayoutConfig_v2
 const bulkPayouts = [payoutConfig, { ...payoutConfig, payoutId: uuidv4() }];
-const bulkResponse = await client.requestBulkPayout(bulkPayouts);
+const bulkResponse = await client.initiateBulkPayout(bulkPayouts);
 ```
 
 ### Refunds
-- **requestRefund(refundConfig, options?)**: Request a refund.
+- **initiateRefund(data, options?)**: Request a refund.
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
-const refundConfig = {
+import type { RequestRefundConfig_v2 } from "pawapay-sdk";
+
+const refundConfig: RequestRefundConfig_v2 = {
   refundId: uuidv4(),
-  depositId: depositConfig.depositId,
+  depositId: "ORIGINAL_DEPOSIT_ID",
   amount: '100.00',
+  currency: 'MWK',
+  clientReferenceId: 'REF-REFUND-001',
   metadata: [{ fieldName: 'reason', fieldValue: 'Customer request' }]
 };
-const refundResponse = await client.requestRefund(refundConfig);
+
+const refundResponse = await client.initiateRefund(refundConfig);
 ```
 - **checkRefundStatus(refundId, options?)**: Get refund status.
 ```typescript
-const refundStatus = await client.checkRefundStatus(refundConfig.refundId);
+const refundStatus = await client.checkRefundStatus("REFUND_ID_UUID");
 ```
 - **resendRefundCallback(refundId, options?)**: Resend refund callback.
 ```typescript
-const resendRefund = await client.resendRefundCallback(refundConfig.refundId);
+const resendRefund = await client.resendRefundCallback("REFUND_ID_UUID");
 ```
 
-### Payment Pages
-- **requestPaymentPage(payload, options?)**: Create a hosted payment page session.
+### Remittances
+- **initiateRemittance(data, options?)**: Initiate a cross-border remittance.
 ```typescript
-const payPageConfig = {
+import type { InitiateRemittanceConfig } from "pawapay-sdk";
+// See type definition for full structure of recipient and sender objects
+const remittanceConfig: InitiateRemittanceConfig = {
+  remittanceId: uuidv4(),
+  amount: "500.00",
+  currency: "ZMW",
+  recipient: { /* ... */ },
+  sender: { /* ... */ },
+  customerMessage: "Family Support",
+  metadata: []
+};
+const response = await client.initiateRemittance(remittanceConfig);
+```
+- **checkRemittanceStatus(remittanceId, options?)**
+- **resendRemittanceCallback(remittanceId, options?)**
+- **cancelEnqueuedRemittance(remittanceId, options?)**
+
+### Payment Pages
+- **requestPayPage(data, options?)**: Create a hosted payment page session.
+```typescript
+import type { RequestPayPageConfig_v2 } from "pawapay-sdk";
+
+const payPageConfig: RequestPayPageConfig_v2 = {
   depositId: uuidv4(),
   returnUrl: 'https://merchant.com/paymentProcessed',
-  statementDescription: 'Ticket purchase',
-  amount: '20.00',
-  msisdn: '265991234567',
+  customerMessage: 'Ticket purchase',
+  amountDetails: {
+    amount: '20.00',
+    currency: 'MWK'
+  },
+  phoneNumber: '265991234567',
   language: 'EN',
   country: 'MWI',
   reason: 'Event ticket',
   metadata: [{ fieldName: 'eventId', fieldValue: 'E123' }]
 };
-const payPageResponse = await client.requestPaymentPage(payPageConfig);
+const payPageResponse = await client.requestPayPage(payPageConfig);
 ```
 
-### Wallets
-- **checkWalletBalances(options?)**: Get all wallet balances.
+### Statements
+- **requestStatement(data, options?)**: Request a financial statement.
 ```typescript
-const walletBalances = await client.checkWalletBalances({});
+const statementReq = {
+    wallet: { country: "MWI", currency: "MWK", provider: "AIRTEL_MWI" },
+    callbackUrl: "https://your-callback.url",
+    startDate: "2023-01-01",
+    endDate: "2023-01-31",
+    compressed: false
+};
+const response = await client.requestStatement(statementReq);
 ```
-- **checkWalletBalancesByCountry(country, options?)**: Get wallet balances for a specific country.
+- **getStatementStatus(statementId, options?)**: Check generation status.
+
+### Wallets
+- **getWalletBalances(options?)**: Get all wallet balances.
 ```typescript
-const mwBalances = await client.checkWalletBalancesByCountry('MWI', {});
+const walletBalances = await client.getWalletBalances({});
 ```
 
 ### Toolkit
-- **getActiveConfiguration(options?)**: Get merchant configuration and supported correspondents.
+- **getActiveConfiguration(options?)**: Get merchant configuration.
 ```typescript
 const config = await client.getActiveConfiguration({});
 ```
-- **getAvailableCorrespondent(options?)**: List available correspondents and their operational status.
+- **getProviderAvailability(options?)**: List available providers and their status.
 ```typescript
-const correspondents = await client.getAvailableCorrespondent({});
+const providers = await client.getProviderAvailability({});
 ```
-- **predictCorrespondent(msisdn, options?)**: Predict the correct correspondent for a phone number.
+- **getProviderPrediction(phoneNumber, options?)**: Predict the provider for a phone number.
 ```typescript
-const prediction = await client.predictCorrespondent('265991234567', {});
+const prediction = await client.getProviderPrediction('265991234567');
 ```
-- **getPublicKey(options?)**: Retrieve public keys for callback signature verification.
+- **getPublicKeys(options?)**: Retrieve public keys for callback signature verification.
 ```typescript
-const publicKeys = await client.getPublicKey({});
+const publicKeys = await client.getPublicKeys({});
 ```
 
 ## Error Handling
@@ -197,67 +263,23 @@ if (response.success) {
 
 ## Types
 
-The following TypeScript types are exported by the `pawapay-sdk` package and can be imported for use in your own code:
+The following TypeScript types are exported by the `pawapay-sdk` package:
 
-- `PawaPayError`
-- `DepositConfig`
-- `DepositResponse`
-- `RequestPayoutConfig`
-- `RequestBulkPayoutConfig`
-- `RequestPayPageConfig`
-- `RequestRefundConfig`
-- `WalletBalance`
-- `PawaPayResponse<T, E>`
-- `BaseRequestPayoutResponse`
-- `RequestBulkPayoutResponse`
-- `RequestPayPageResponse`
-- `RequestRefundResponse`
-- `WalletBalanceResponse`
-- `DepositCallback`
-- `PayoutCallback`
-- `RefundCallback`
-- `PayPageCallback`
+- `DepositConfig_v2`, `DepositResponse_v2`, `DepositStatusResponse_v2`
+- `RequestPayoutConfig_v2`, `RequestPayoutResponse_v2`
+- `RequestRefundConfig_v2`, `RequestRefundResponse_v2`
+- `InitiateRemittanceConfig`, `InitiateRemittanceResponse`
+- `RequestPayPageConfig_v2`
+- `RequestStatementConfig`, `RequestStatementResponse_v2`
+- `WalletBalance_v2`
+- `ProviderAvailability_v2`
+- `ProviderPrediction_v2`
+- `PawaPayResponse`, `PawaPayError`
 
 **Example:**
 
 ```typescript
-import { DepositConfig, PawaPayResponse, PawaPayError } from "pawapay-sdk";
-```
-
-- **checkWalletBalancesByCountry(country, options?)**: Get wallet balances for a specific country.
-```typescript
-const mwBalances = await client.checkWalletBalancesByCountry('MWI', {});
-```
-
-### Toolkit
-- **getActiveConfiguration(options?)**: Get merchant configuration and supported correspondents.
-```typescript
-const config = await client.getActiveConfiguration({});
-```
-- **getAvailableCorrespondent(options?)**: List available correspondents and their operational status.
-```typescript
-const correspondents = await client.getAvailableCorrespondent({});
-```
-- **predictCorrespondent(msisdn, options?)**: Predict the correct correspondent for a phone number.
-```typescript
-const prediction = await client.predictCorrespondent('265991234567', {});
-```
-- **getPublicKey(options?)**: Retrieve public keys for callback signature verification.
-```typescript
-const publicKeys = await client.getPublicKey({});
-```
-
-## Error Handling
-All methods return a `PawaPayResponse<T, E>` object:
-```typescript
-const response = await client.requestDeposit(depositConfig);
-if (response.success) {
-  // Access response.data
-  console.log('Success:', response.data);
-} else {
-  // Access response.error and response.status
-  console.error('Error:', response.error, 'Status:', response.status);
-}
+import { DepositConfig_v2, PawaPayResponse, PawaPayError } from "pawapay-sdk";
 ```
 
 ## Environments

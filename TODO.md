@@ -33,3 +33,7 @@
 - Correspondent Availability ✅
 - Predict Correspondent ✅
 - Public Keys ✅
+
+## V2
+- Documentation
+- JSDocs

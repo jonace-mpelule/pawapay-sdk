@@ -1,250 +1,222 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import {
-    DepositConfig,
-    PawaPayError,
-    DepositResponse,
-    PawaPayResponse,
-    RequestOptions,
-    DepositStatus,
-    ResendDepositResponse,
-    WalletBalance,
-    PublicKeysResponse,
-    ActiveConfigurationResponse,
-    AvailableCorrespondentResponse,
-    PredictCorrespondentResponse,
-    RequestPayPageConfig,
-    RequestPayPageResponse,
-    RequestRefundConfig,
-    RequestRefundResponse,
-    ResendRefundCallbackResponse,
-    RequestPayoutConfig,
-    RequestPayoutRespose,
-    CheckPayoutStatusResponse,
-    CancelEnqueuedPayoutResponse,
-    RequestBulkPayoutConfig,
-    RequestBuildPayoutResponse,
-    ResendPayoutCallbackResponse,
-    CheckRefundStatusResponse
-} from './types/index.t.ts';
+/** biome-ignore-all lint/suspicious/noExplicitAny: <'can use any'> */
+import axios, { type AxiosInstance } from "axios";
+import signale from "signale";
+import V1_Implementations from "./fn/v1_implementations.ts";
+import V2_Implementations from "./fn/v2_implementations.ts";
+import type { V1Methods, V2Methods } from "./types/methods.t.ts";
 
+export type ApiVersion = "v1" | "v2";
 
+export type ClientConfig<T extends ApiVersion> = {
+  apiVersion?: T;
+  environment?: "live" | "sandbox";
+};
 
-type ClientConfig = {
-    environment?: "live" | "sandbox",
-    overrideUrl?: string
-}
+export class PawaPayClient<T extends ApiVersion> {
+  private apiClient: AxiosInstance;
+  protected apiKey: string;
+  private config: ClientConfig<T>;
+  private v1_Implementation: V1_Implementations;
+  private v2_Implementation: V2_Implementations;
 
-export class PawaPayClient {
-    private apiClient: AxiosInstance;
-    protected apiKey: string;
-    private config?: ClientConfig;
+  constructor(
+    apiKey: string,
+    config?: ClientConfig<T> & {
+      apiVersion: T;
+    },
+  ) {
+    this.apiKey = apiKey;
+    this.config = {
+      apiVersion: config?.apiVersion ?? "v2",
+      ...config,
+    };
 
-    constructor(apiKey: string, config?: ClientConfig,) {
-        this.apiKey = apiKey;
-        this.config = config
-        this.apiClient = axios.create({
-            baseURL: config?.overrideUrl ?? config?.environment == "live" ? 'https://api.pawapay.io' : 'https://api.sandbox.pawapay.io',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.apiKey}`
-            }
-        });
+    if (this.config.apiVersion === "v1") {
+      signale.warn("⚠️ Pawapay v1 is deprecated. Upgrade to v2.");
     }
 
-    private async request<T, E>(config: AxiosRequestConfig, options?: RequestOptions)
-        : Promise<PawaPayResponse<T, E>> {
-        try {
-            const response = await this.apiClient.request<T>(config);
-            return {
-                success: true,
-                data: response.data,
-                status: response.status,
-                headers: response.headers
-            }
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                return {
-                    success: false,
-                    error: error.response?.data || error.message,
-                    status: error.response?.status || 500
-                }
-            }
-            return {
-                success: false,
-                error: {
-                    errorMessage: 'Unknown error occurred'
-                } as E,
-                status: 500
-            };
-        }
+    const baseURL =
+      this.config.apiVersion === "v2"
+        ? this.config.environment === "live"
+          ? "https://api.pawapay.io/v2"
+          : "https://api.sandbox.pawapay.io/v2"
+        : this.config.environment === "live"
+          ? "https://api.pawapay.io"
+          : "https://api.sandbox.pawapay.io";
+
+    this.apiClient = axios.create({
+      baseURL,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+    });
+
+    this.v1_Implementation = new V1_Implementations(this.apiClient);
+    this.v2_Implementation = new V2_Implementations(this.apiClient);
+
+    /**
+     * NOTE: Register Methods
+     */
+
+    if (this.config.apiVersion === "v1") {
+      this.requestDeposit = this.v1_Implementation.requestDeposit as any;
+      this.checkDepositStatus = this.v1_Implementation
+        .checkDepositStatus as any;
+      this.resendDepositCallback = this.v1_Implementation
+        .resendDepositCallback as any;
+      this.checkPayoutStatus = this.v1_Implementation.checkPayoutStatus as any;
+      this.requestPayout = this.v1_Implementation.requestPayout as any;
+      this.cancelEnqueuedPayout = this.v1_Implementation
+        .cancelEnqueuedPayout as any;
+      this.resendPayoutCallback = this.v1_Implementation
+        .resendPayoutCallback as any;
+      this.initiateRefund = this.v1_Implementation.initiateRefund as any;
+      this.initiateBulkPayout = this.v1_Implementation
+        .initiateBulkPayout as any;
+      this.checkRefundStatus = this.v1_Implementation.checkRefundStatus as any;
+      this.resendRefundCallback = this.v1_Implementation
+        .resendRefundCallback as any;
+      this.requestPayPage = this.v1_Implementation.requestPayPage as any;
+      this.getWalletBalances = this.v1_Implementation.getWalletBalances as any;
+      this.getWalletBalancesByCountry = this.v1_Implementation
+        .getWalletBalancesByCountry as any;
+      this.getActiveConfiguration = this.v1_Implementation
+        .getActiveConfiguration as any;
+      this.getProviderAvailability = this.v1_Implementation
+        .getProviderAvailability as any;
+      this.getProviderPrediction = this.v1_Implementation
+        .getProviderPrediction as any;
+      this.getPublicKeys = this.v1_Implementation.getPublicKeys as any;
     }
 
-    // --- Deposits
-
-    async requestDeposit(data: DepositConfig, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<DepositResponse, PawaPayError>> {
-
-        return this.request({
-            method: 'POST',
-            url: '/deposits',
-            data,
-        }, options)
+    if (this.config.apiVersion === "v2") {
+      this.requestDeposit = this.v2_Implementation.requestDeposit as any;
+      this.checkDepositStatus = this.v2_Implementation
+        .checkDepositStatus as any;
+      this.resendDepositCallback = this.v2_Implementation
+        .resendDepositCallback as any;
+      this.checkPayoutStatus = this.v2_Implementation.checkPayoutStatus as any;
+      this.requestPayout = this.v2_Implementation.requestPayout as any;
+      this.cancelEnqueuedPayout = this.v2_Implementation
+        .cancelEnqueuedPayout as any;
+      this.resendPayoutCallback = this.v2_Implementation
+        .resendPayoutCallback as any;
+      this.initiateBulkPayout = this.v2_Implementation
+        .initiateBulkPayout as any;
+      this.initiateRefund = this.v2_Implementation.initiateRefund as any;
+      this.checkRefundStatus = this.v2_Implementation.checkRefundStatus as any;
+      this.resendRefundCallback = this.v2_Implementation
+        .resendRefundCallback as any;
+      this.initiateRemittance = this.v2_Implementation
+        .initiateRemittance as any;
+      this.resendRemittanceCallback = this.v2_Implementation
+        .resendRemittanceCallback as any;
+      this.checkRemittanceStatus = this.v2_Implementation
+        .checkRemittanceStatus as any;
+      this.cancelEnqueuedRemittance = this.v2_Implementation
+        .cancelEnqueuedRemittance as any;
+      this.requestPayPage = this.v2_Implementation.requestPayPage as any;
+      this.getWalletBalances = this.v2_Implementation.getWalletBalances as any;
+      this.requestStatement = this.v2_Implementation.requestStatement as any;
+      this.getStatementStatus = this.v2_Implementation
+        .getStatementStatus as any;
+      this.getActiveConfiguration = this.v2_Implementation
+        .getActiveConfiguration as any;
+      this.getProviderAvailability = this.v2_Implementation
+        .getProviderAvailability as any;
+      this.getProviderPrediction = this.v2_Implementation
+        .getProviderPrediction as any;
+      this.getPublicKeys = this.v2_Implementation.getPublicKeys as any;
     }
+  }
 
+  requestDeposit!: T extends "v1"
+    ? V1Methods["requestDeposit"]
+    : V2Methods["requestDeposit"];
 
-    async checkDepositStatus(depositId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<DepositStatus[], PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: `/deposits/${depositId}`
-        }, options)
-    }
+  checkDepositStatus!: T extends "v1"
+    ? V1Methods["checkDepositStatus"]
+    : V2Methods["checkDepositStatus"];
 
-    async resendDepositCallback(depositId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<ResendDepositResponse, PawaPayError>> {
-        const data = { depositId }
-        return this.request({
-            method: 'POST',
-            url: '/deposits/resend-callback',
-            data,
-        }, options)
-    }
+  resendDepositCallback!: T extends "v1"
+    ? V1Methods["resendDepositCallback"]
+    : V2Methods["resendDepositCallback"];
 
-    // --- PAYOUTS
+  checkPayoutStatus!: T extends "v1"
+    ? V1Methods["checkPayoutStatus"]
+    : V2Methods["checkPayoutStatus"];
 
-    async requestPayout(data: RequestPayoutConfig, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<RequestPayoutRespose, PawaPayError>> {
-        return this.request({
-            method: 'POST',
-            url: '/payouts',
-            data
-        }, options)
-    }
+  requestPayout!: T extends "v1"
+    ? V1Methods["requestPayout"]
+    : V2Methods["requestPayout"];
 
-    async checkPayoutStatus(payoutId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<CheckPayoutStatusResponse[], PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: `/payouts/${payoutId}`
-        }, options)
-    }
+  cancelEnqueuedPayout!: T extends "v1"
+    ? V1Methods["cancelEnqueuedPayout"]
+    : V2Methods["cancelEnqueuedPayout"];
 
-    async resendPayoutCallback(payoutId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<ResendPayoutCallbackResponse, PawaPayError>> {
-        const data = { payoutId }
-        return this.request({
-            method: 'POST',
-            url: '/payouts/resend-callback',
-            data
-        }, options)
-    }
+  resendPayoutCallback!: T extends "v1"
+    ? V1Methods["resendPayoutCallback"]
+    : V2Methods["resendPayoutCallback"];
 
-    async cancelEnqueuedPayout(payoutId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<CancelEnqueuedPayoutResponse, PawaPayError>> {
-        return this.request({
-            method: 'POST',
-            url: `/payouts/fail-enqueued/${payoutId}`,
-        }, options)
-    }
+  initiateBulkPayout!: T extends "v1"
+    ? V1Methods["initiateBulkPayout"]
+    : V2Methods["initiateBulkPayout"];
 
-    async requestBulkPayout(data: RequestBulkPayoutConfig[], { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<RequestBuildPayoutResponse[], PawaPayError>> {
-        return this.request({
-            method: 'POST',
-            url: '/payouts/bulk',
-            data,
-        }, options)
-    }
+  initiateRefund!: T extends "v1"
+    ? V1Methods["initiateRefund"]
+    : V2Methods["initiateRefund"];
 
-    // --- REFUND
-    async requestRefund(refundConfig: RequestRefundConfig, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<RequestRefundResponse, PawaPayError>> {
-        return this.request({
-            method: "POST",
-            url: '/refunds',
-            data: refundConfig
-        }, options)
-    }
+  checkRefundStatus!: T extends "v1"
+    ? V1Methods["checkRefundStatus"]
+    : V2Methods["checkRefundStatus"];
 
-    async checkRefundStatus(refundId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<CheckRefundStatusResponse[], PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: `/refunds/${refundId}`
-        }, options)
-    }
+  resendRefundCallback!: T extends "v1"
+    ? V1Methods["resendRefundCallback"]
+    : V2Methods["resendRefundCallback"];
 
-    async resendRefundCallback(refundId: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<ResendRefundCallbackResponse, PawaPayError>> {
-        return this.request({
-            method: 'POST',
-            url: '/refund/resend-callback',
-            data: { refundId }
-        }, options)
-    }
+  initiateRemittance!: T extends "v1" ? never : V2Methods["initiateRemittance"];
 
-    // --- PAYMENT PAGE
+  resendRemittanceCallback!: T extends "v1"
+    ? never
+    : V2Methods["resendRemittanceCallback"];
 
-    async requestPaymentPage(payload: RequestPayPageConfig, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<RequestPayPageResponse, PawaPayError>> {
-        return this.request({
-            method: 'POST',
-            url: '/v1/widget/sessions',
-            data: payload
-        })
-    }
+  checkRemittanceStatus!: T extends "v1"
+    ? never
+    : V2Methods["checkRemittanceStatus"];
 
-    // --- WALLETS
+  cancelEnqueuedRemittance!: T extends "v1"
+    ? never
+    : V2Methods["cancelEnqueuedRemittance"];
 
-    async checkWalletBalances({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<WalletBalance, PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: '/v1/wallet-balances'
-        }, options)
-    }
+  requestPayPage!: T extends "v1"
+    ? V1Methods["requestPayPage"]
+    : V2Methods["requestPayPage"];
 
-    async checkWalletBalancesByCountry(country: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<WalletBalance, PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: `/v1/wallet-balances/${country}`
-        })
-    }
+  getWalletBalances!: T extends "v1"
+    ? V1Methods["getWalletBalances"]
+    : V2Methods["getWalletBalances"];
+  getWalletBalancesByCountry!: T extends "v1"
+    ? V1Methods["getWalletBalancesByCountry"]
+    : never;
 
-    // --- TOOLKIT
+  requestStatement!: T extends "v1" ? never : V2Methods["requestStatement"];
 
-    async getActiveConfiguration({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<ActiveConfigurationResponse, PawaPayError>> {
-        return this.request({
-            method: `GET`,
-            url: `/active-conf`
-        }, options)
-    }
+  getStatementStatus!: T extends "v1" ? never : V2Methods["getStatementStatus"];
 
-    async getAvailableCorrespondent({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<AvailableCorrespondentResponse[], PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: '/availability'
-        }, options)
-    }
+  getActiveConfiguration!: T extends "v1"
+    ? V1Methods["getActiveConfiguration"]
+    : V2Methods["getActiveConfiguration"];
 
-    predictCorrespondent(msisdn: string, { options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<PredictCorrespondentResponse, PawaPayError>> {
-        const data = { msisdn }
-        return this.request({
-            method: 'GET',
-            url: '/v1/predict-correspondent',
-            data
-        }, options)
-    }
+  getProviderAvailability!: T extends "v1"
+    ? V1Methods["getProviderAvailability"]
+    : V2Methods["getProviderAvailability"];
 
-    getPublicKey({ options }: { options?: RequestOptions } = {})
-        : Promise<PawaPayResponse<PublicKeysResponse[], PawaPayError>> {
-        return this.request({
-            method: 'GET',
-            url: '/public-key/https'
-        }, options)
-    }
+  getProviderPrediction!: T extends "v1"
+    ? V1Methods["getProviderAvailability"]
+    : V2Methods["getProviderPrediction"];
+
+  getPublicKeys!: T extends "v1"
+    ? V1Methods["getPublicKeys"]
+    : V2Methods["getPublicKeys"];
 }
