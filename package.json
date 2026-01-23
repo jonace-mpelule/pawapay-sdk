@@ -1,6 +1,6 @@
 {
   "name": "pawapay-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A comprehensive TypeScript/JavaScript SDK for integrating with the pawaPay API, enabling seamless mobile money operations such as deposits, payouts, refunds, wallet balance checks, and more.",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
