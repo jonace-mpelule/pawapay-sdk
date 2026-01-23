@@ -51,7 +51,7 @@ import type {
 import request from "./axios.fn.ts";
 
 export default class V2_Implementations implements V2Methods {
-  apiClient: AxiosInstance;
+  private apiClient: AxiosInstance;
 
   constructor(apiClient: AxiosInstance) {
     this.apiClient = apiClient;
@@ -72,7 +72,7 @@ export default class V2_Implementations implements V2Methods {
         url: Endpoints.v2.deposits.requestDeposit,
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -86,7 +86,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.deposits.getDepositStatus(depositId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -100,7 +100,7 @@ export default class V2_Implementations implements V2Methods {
         method: "POST",
         url: Endpoints.v2.deposits.resendDepositCallback(depositId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -119,7 +119,7 @@ export default class V2_Implementations implements V2Methods {
         data,
         url: Endpoints.v2.payouts.requestPayout,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -133,7 +133,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: `/payouts/${payoutId}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -147,7 +147,7 @@ export default class V2_Implementations implements V2Methods {
         method: "DELETE",
         url: Endpoints.v2.payouts.cancelPayout(payoutId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -161,7 +161,7 @@ export default class V2_Implementations implements V2Methods {
         method: "POST",
         url: `/payouts/${payoutId}/resend-callback`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -176,7 +176,7 @@ export default class V2_Implementations implements V2Methods {
         data,
         url: Endpoints.v2.payouts.initiateBulkPayout,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -195,7 +195,7 @@ export default class V2_Implementations implements V2Methods {
         data,
         url: Endpoints.v2.refunds.initiateRefund,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -209,7 +209,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.refunds.checkRefundStatus(refundId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -223,7 +223,7 @@ export default class V2_Implementations implements V2Methods {
         method: "POST",
         url: Endpoints.v2.refunds.resendRefundCallback(refundId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -242,7 +242,7 @@ export default class V2_Implementations implements V2Methods {
         data,
         url: Endpoints.v2.remittences.initiateRemittance,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -256,7 +256,7 @@ export default class V2_Implementations implements V2Methods {
         method: "POST",
         url: Endpoints.v2.remittences.resendRemittenceCallback(remittanceId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -270,7 +270,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.remittences.getRemittanceStatus(remittanceId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -284,7 +284,7 @@ export default class V2_Implementations implements V2Methods {
         method: "POST",
         url: Endpoints.v2.remittences.cancelEnqueuedRemittance(remittanceId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -303,7 +303,7 @@ export default class V2_Implementations implements V2Methods {
         data,
         url: Endpoints.v2.requestPayPage,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -319,7 +319,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.financial.getWalletBalances,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -334,7 +334,7 @@ export default class V2_Implementations implements V2Methods {
         url: Endpoints.v2.financial.requestStatement,
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -350,7 +350,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.financial.getStatementStatus(statementId),
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -367,7 +367,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.toolkit.getActiveConfiguration,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -380,7 +380,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.toolkit.getProviderAvailability,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -397,7 +397,7 @@ export default class V2_Implementations implements V2Methods {
         data: { phoneNumber },
         url: Endpoints.v2.toolkit.getProviderPrediction,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -410,7 +410,7 @@ export default class V2_Implementations implements V2Methods {
         method: "GET",
         url: Endpoints.v2.toolkit.getPublicKeys,
       },
-      args.options,
+      args?.options,
     );
   }
 }

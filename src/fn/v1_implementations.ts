@@ -32,7 +32,7 @@ import type { V1Methods } from "@/types/methods.t.ts";
 import request from "./axios.fn.ts";
 
 export default class V1_Implementations implements V1Methods {
-  apiClient: AxiosInstance;
+  private apiClient: AxiosInstance;
 
   constructor(apiClient: AxiosInstance) {
     this.apiClient = apiClient;
@@ -50,7 +50,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/deposits/resend-callback",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -65,7 +65,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/deposits",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -79,7 +79,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: `/deposits/${depositId}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -94,7 +94,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/payouts",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -108,7 +108,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: `/payouts/${payoutId}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -124,7 +124,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/payouts/resend-callback",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -138,7 +138,7 @@ export default class V1_Implementations implements V1Methods {
         method: "POST",
         url: `/payouts/fail-enqueued/${payoutId}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -153,7 +153,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/payouts/bulk",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
   // --- REFUND
@@ -168,7 +168,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/refunds",
         data: refundConfig,
       },
-      args.options,
+      args?.options,
     );
   }
   async checkRefundStatus(
@@ -181,7 +181,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: `/refunds/${refundId}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -196,7 +196,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/refund/resend-callback",
         data: { refundId },
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -213,7 +213,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/v1/widget/sessions",
         data: payload,
       },
-      args.options,
+      args?.options,
     );
   }
   // --- WALLETS
@@ -227,7 +227,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: "/v1/wallet-balances",
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -241,7 +241,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: `/v1/wallet-balances/${country}`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -256,7 +256,7 @@ export default class V1_Implementations implements V1Methods {
         method: `GET`,
         url: `/active-conf`,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -274,7 +274,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/deposits/resend-callback",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -287,7 +287,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: "/availability",
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -305,7 +305,7 @@ export default class V1_Implementations implements V1Methods {
         url: "/v1/predict-correspondent",
         data,
       },
-      args.options,
+      args?.options,
     );
   }
 
@@ -318,7 +318,7 @@ export default class V1_Implementations implements V1Methods {
         method: "GET",
         url: "/public-key/https",
       },
-      args.options,
+      args?.options,
     );
   }
 }
