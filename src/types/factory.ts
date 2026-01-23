@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <'can be used'> */
 import { type ClientConfig, PawaPayClient } from "@/client.ts";
 import type { V1Methods, V2Methods } from "./methods.t.ts";
 
@@ -18,15 +19,21 @@ export function createPawaPayClient(
   apiKey: string,
   config: ClientConfig<"v1" | "v2">,
 ) {
-  const internalV1 = new PawaPayClient<"v1">(apiKey, {
-    apiVersion: "v1",
-    environment: config.environment,
-  });
+  const internalV1 =
+    config?.apiVersion === "v1"
+      ? new PawaPayClient<"v1">(apiKey, {
+          apiVersion: "v1",
+          environment: config.environment,
+        })
+      : (undefined as any);
 
-  const internalV2 = new PawaPayClient<"v2">(apiKey, {
-    apiVersion: "v2",
-    environment: config.environment,
-  });
+  const internalV2 =
+    config?.apiVersion !== "v1"
+      ? new PawaPayClient<"v2">(apiKey, {
+          apiVersion: "v2",
+          environment: config.environment,
+        })
+      : (undefined as any);
 
   if (config?.apiVersion === "v1") {
     /**

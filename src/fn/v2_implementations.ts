@@ -61,7 +61,7 @@ export default class V2_Implementations implements V2Methods {
    * INFO: Deposits
    */
 
-  requestDeposit(
+  async requestDeposit(
     data: DepositConfig_v2,
     args?: { options?: RequestOptions },
   ): Promise<PawaPayResponse<DepositResponse_v2, PawaPayError>> {
@@ -76,7 +76,7 @@ export default class V2_Implementations implements V2Methods {
     );
   }
 
-  checkDepositStatus(
+  async checkDepositStatus(
     depositId: string,
     args?: { options?: RequestOptions },
   ): Promise<PawaPayResponse<DepositStatusResponse_v2, PawaPayError>> {
