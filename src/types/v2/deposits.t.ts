@@ -151,21 +151,18 @@ export type DepositCallBack_v2 = {
   payer: {
     type: "MMO";
     accountDetails: {
-      phoneNumber: "260763456789";
-      provider: "MTN_MOMO_ZMB";
+      phoneNumber: string;
+      provider: string;
     };
   };
-  created: "2020-02-21T17:32:29Z";
-  customerMessage: "Note of 4 to 22 chars";
-  providerTransactionId: "ABC123";
+  created: string;
+  customerMessage: string;
+  providerTransactionId: string;
   failureReason: {
-    failureCode: "INSUFFICIENT_BALANCE";
-    failureMessage: "The customer does not have enough funds to complete this payment.";
+    failureCode: string;
+    failureMessage: string;
   };
-  metadata: {
-    orderId: "ORD-123456789";
-    customerId: "customer@email.com";
-  };
+  metadata: Record<string, unknown>;
 };
 
 export type DepositConfig_v2 = {
